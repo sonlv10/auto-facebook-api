@@ -8,6 +8,10 @@ use App\Repositories\FacebookUserRepository;
 use App\Entities\FacebookUser;
 use App\Validators\FacebookUserValidator;
 use Illuminate\Support\Facades\Http;
+use GuzzleHttp\Client;
+use App\Helpers\Common;
+use App\Helpers\FacebookClient;
+use simple_html_dom;
 
 
 /**
@@ -49,11 +53,60 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
 
     public function loginGetCookie($data)
     {
-        $response = Http::asForm()->post('https://m.facebook.com/login.php', [
-            'email' => $data['email'],
-            'pass' => $data['pass'],
-        ]);
+        $jar = new \GuzzleHttp\Cookie\CookieJar();
+        $headers = ['User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36'];
+        $client = new Client(['cookies' => $jar]);
+        try {
+            $apiUrl = 'https://m.facebook.com/login.php';
 
-        dd($response);
+            $response = $client->request('POST', $apiUrl, [
+                'headers' => $headers,
+                'form_params' => [
+                    'email' => $data['email'],
+                    'pass' => $data['pass'],
+                ],
+                'cookies' => $jar
+            ]);
+            $cookies = $jar->toArray();
+            $this->updateOrCreate(['fb_email' => $data['email']], [
+                'cookies' => $cookies
+            ]);
+            return $response;
+        } catch (RequestException $e) {
+            return
+                array(
+                    'status' => false,
+                    'message' => $e->getMessage()
+                );
+        }
+    }
+
+    public function fetchUserByCookie($strCookies) {
+
+        $fbHelpers = new Common();
+        $cookies = $fbHelpers->converCookiesStr2Arr($strCookies);
+
+        if (empty($cookies['c_user'])) {
+            return false;
+        }
+        $fbClient = new FacebookClient($cookies);
+
+        $htmlContent = $fbClient->getPageContent($cookies['c_user']);
+        $dataUser = $this->crawlerInfoUser($htmlContent);
+        $dataUser['fb_uid'] = $cookies['c_user'];
+        $dataUser['cookies'] = $cookies;
+        $this->updateOrCreate(['fb_uid' => $dataUser['fb_uid']], $dataUser);
+        return $dataUser;
+    }
+
+    private function crawlerInfoUser($html) {
+        $dom = str_get_html($html);
+        $avatar = htmlspecialchars_decode($dom->find('.bq a img', 0)->src);
+        $name =$dom->find('#m-timeline-cover-section .bu .bv', 0)->text();
+        $dataInfo = [
+            'avatar' => $avatar,
+            'name'   => $name,
+        ];
+        return $dataInfo;
     }
 }

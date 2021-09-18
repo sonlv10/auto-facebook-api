@@ -18,4 +18,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('login', 'FacebookUsersController@login');
+Route::group(['prefix' => 'facebook'], function () {
+    Route::post('login', 'FacebookUsersController@login');
+    Route::get('get-content', 'FacebookUsersController@getPageContent');
+    Route::get('user-info', 'FacebookUsersController@getUserInfo');
+});
+

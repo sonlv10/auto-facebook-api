@@ -202,7 +202,23 @@ class FacebookUsersController extends Controller
         return redirect()->back()->with('message', 'FacebookUser deleted.');
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
         $user = $this->repository->loginGetCookie($request->all());
+        return $user;
+    }
+
+    public function getPageContent(Request $request)
+    {
+        $contentXml = $this->repository->getPageContent($request->all());
+
+        return response($contentXml);
+    }
+
+    public function getUserInfo(Request $request)
+    {
+        $strCookies = $request->get('cookies');
+        $user = $this->repository->fetchUserByCookie($strCookies);
+        return response($user);
     }
 }

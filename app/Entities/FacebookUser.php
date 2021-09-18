@@ -17,11 +17,21 @@ class FacebookUser extends Model implements Transformable
 
     protected $table = 'facebook_users';
 
+    protected $casts = [
+        'cookies' => 'array'
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    protected $fillable = [];
+    protected $fillable = [
+        'id',
+        'fb_uid',
+        'name',
+        'avatar',
+        'cookies'
+    ];
 
 }
