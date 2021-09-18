@@ -102,7 +102,7 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
     private function crawlerInfoUser($html) {
         $dom = str_get_html($html);
         $avatar = htmlspecialchars_decode($dom->find('.bq a img', 0)->src);
-        $name =$dom->find('#m-timeline-cover-section .bu .bv', 0)->text();
+        $name =$dom->find('#m-timeline-cover-section strong', 0)->text();
         $dataInfo = [
             'avatar' => $avatar,
             'name'   => $name,

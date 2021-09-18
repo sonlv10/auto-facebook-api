@@ -11,13 +11,14 @@ class Common
     }
 
     public function converCookiesStr2Arr($strCookies) {
-        $headerCookies = explode('; ', $strCookies);
-
+        $headerCookies = explode(';', $strCookies);
         $cookies = array();
 
         foreach($headerCookies as $itm) {
-            list($key, $val) = explode('=', $itm, 2);
-            $cookies[$key] = $val;
+            if (!empty($itm)) {
+                list($key, $val) = explode('=', $itm, 2);
+                $cookies[$key] = $val;
+            }
         }
         return $cookies;
     }
