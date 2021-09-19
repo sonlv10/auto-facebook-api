@@ -13,14 +13,19 @@ class FacebookClient
 {
     protected $client;
 
-    public function __construct(array $cookies) {
-        $jar = CookieJar::fromArray($cookies, 'm.facebook.com');
-        $this->client = $client = new Client(['cookies' => $jar]);
+    public function __construct(array $data) {
+        $jar = CookieJar::fromArray($data['cookies'], 'facebook.com');
+        $this->client = $client = new Client([
+            'cookies' => $jar,
+            'headers' => [
+                'User-Agent' => $data['userAgent'],
+                'Sec-Fetch-User' => '?1',
+            ]]);
     }
 
     public function getPageContent($path) {
         try {
-            $pageUrl = config('facebook.m_domain') . $path;
+            $pageUrl = config('facebook.mbasic_domain') . $path;
 
             $response = $this->client->request('GET', $pageUrl);
             $resultshtml = $response->getBody()->getContents();

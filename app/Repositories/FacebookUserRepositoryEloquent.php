@@ -81,15 +81,25 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
         }
     }
 
-    public function fetchUserByCookie($strCookies) {
+    public function fetchUserByCookie($data) {
 
         $fbHelpers = new Common();
-        $cookies = $fbHelpers->converCookiesStr2Arr($strCookies);
 
+        $cookies = $data['cookies'];
+        if (is_array($cookies)) {
+            $cookies = $fbHelpers->getStrCookies($cookies);
+        }
+
+        $cookies = $fbHelpers->converCookiesStr2Arr($cookies);
         if (empty($cookies['c_user'])) {
             return false;
         }
-        $fbClient = new FacebookClient($cookies);
+
+        logger($cookies);
+        $fbClient = new FacebookClient([
+            'cookies' => $cookies,
+            'userAgent' => $data['userAgent']
+        ]);
 
         $htmlContent = $fbClient->getPageContent($cookies['c_user']);
         $dataUser = $this->crawlerInfoUser($htmlContent);

@@ -217,8 +217,8 @@ class FacebookUsersController extends Controller
 
     public function getUserInfo(Request $request)
     {
-        $strCookies = $request->get('cookies');
-        $user = $this->repository->fetchUserByCookie($strCookies);
+        $data = $request->all();
+        $user = $this->repository->fetchUserByCookie($data);
         return response($user);
     }
 }

@@ -11,6 +11,7 @@ class Common
     }
 
     public function converCookiesStr2Arr($strCookies) {
+        $strCookies = str_replace(" ","",$strCookies);
         $headerCookies = explode(';', $strCookies);
         $cookies = array();
 
@@ -21,5 +22,15 @@ class Common
             }
         }
         return $cookies;
+    }
+
+    public function getStrCookies($cookiesArr)
+    {
+        $strCookies = '';
+        foreach ($cookiesArr as $cookie) {
+            $strCookies .= $cookie['name'] . '=' . $cookie['value'] . ';';
+        }
+        return $strCookies;
+        dd($strCookies);
     }
 }
