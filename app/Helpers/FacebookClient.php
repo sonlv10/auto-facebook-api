@@ -23,7 +23,7 @@ class FacebookClient
     public function callAPI($method, $endpoint, $data = null) {
         try {
             $response = $this->client->request($method, $endpoint, [
-                'body' => $method !== 'GET' ? json_encode($data) : null
+                'body' => $method !== 'GET' ? $data : null
             ]);
         } catch (RequestException $e) {
             return
@@ -32,7 +32,12 @@ class FacebookClient
                     'message' => $e->getMessage()
                 );
         }
-        return $response->getBody()->getContents();
+
+        $responseDataXml = $response->getBody()->getContents();
+
+        $this->storeDataXml($responseDataXml, $endpoint);
+
+        return $responseDataXml;
     }
 
     public function storeDataXml($responseDataXml, $path)

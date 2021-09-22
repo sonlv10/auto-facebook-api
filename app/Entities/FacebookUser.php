@@ -31,7 +31,8 @@ class FacebookUser extends Model implements Transformable
         'fb_uid',
         'name',
         'avatar',
-        'cookies'
+        'cookies',
+        'access_token',
     ];
 
 }

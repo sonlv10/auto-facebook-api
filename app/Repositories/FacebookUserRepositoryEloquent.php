@@ -99,7 +99,8 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
             'cookies' => $cookies,
             'headers' => [
                 'userAgent' => $data['userAgent'],
-                'Sec-Fetch-User' => '?1'
+                'Sec-Fetch-User' => '?1',
+                "Content-type" => "application/x-www-form-urlencoded"
             ]
         ]);
 
@@ -107,8 +108,25 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
         $dataUser = $this->crawlerInfoUser($htmlContent);
         $dataUser['fb_uid'] = $cookies['c_user'];
         $dataUser['cookies'] = $cookies;
+
+        $dataUser['access_token'] = $this->getToken($fbClient, $htmlContent);
+
         $this->updateOrCreate(['fb_uid' => $dataUser['fb_uid']], $dataUser);
         return $dataUser;
+    }
+
+    private function getToken($client, $html)
+    {
+        $fbHelpers = new Common();
+        $dtsg = $fbHelpers->get_string_between($html, 'name="fb_dtsg" value="', '"');
+        $url = config('facebook.domain') . 'v1.0/dialog/oauth/confirm';
+        $params = 'fb_dtsg=' . $dtsg . '&app_id=124024574287414&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=page&access_token=&from_post=1&return_format=access_token&domain=&sso_device=ios&_CONFIRM=1&_user=100072773571604';
+
+
+        $htmlToken = $client->callAPI('POST', $url, $params);
+        $token = $fbHelpers->get_string_between($htmlToken, 'access_token=', '&');
+
+        return $token;
     }
 
     public function getUserFriends($data)
