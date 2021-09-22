@@ -95,18 +95,38 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
             return false;
         }
 
-        logger($cookies);
         $fbClient = new FacebookClient([
             'cookies' => $cookies,
-            'userAgent' => $data['userAgent']
+            'headers' => [
+                'userAgent' => $data['userAgent'],
+                'Sec-Fetch-User' => '?1'
+            ]
         ]);
 
-        $htmlContent = $fbClient->getPageContent($cookies['c_user']);
+        $htmlContent = $fbClient->callAPI('GET', config('facebook.mbasic_domain'). $cookies['c_user']);
         $dataUser = $this->crawlerInfoUser($htmlContent);
         $dataUser['fb_uid'] = $cookies['c_user'];
         $dataUser['cookies'] = $cookies;
         $this->updateOrCreate(['fb_uid' => $dataUser['fb_uid']], $dataUser);
         return $dataUser;
+    }
+
+    public function getUserFriends($data)
+    {
+        $user = $this->findWhere(['fb_uid' => $data['fb_uid']])->first();
+        if (empty($user)) {
+            return false;
+        }
+        $fbClient = new FacebookClient([
+            'cookies' => $user->cookies,
+            'headers' => [
+                'userAgent' => $data['userAgent'],
+                'Sec-Fetch-User' => '?1'
+            ]
+        ]);
+        $htmlContent = $fbClient->callAPI('GET', config('facebook.mbasic_domain'). 'friends/center/friends/');
+        $listFriends = $this->crawlerUserFriends($htmlContent);
+        return $listFriends;
     }
 
     private function crawlerInfoUser($html) {
@@ -118,5 +138,17 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
             'name'   => $name,
         ];
         return $dataInfo;
+    }
+
+    private function crawlerUserFriends($html) {
+        $listFriends = array();
+        $dom = str_get_html($html);
+        $list =$dom->find('#friends_center_main table');
+        foreach($list as $friend) {
+            $name = $friend->find('a', 0)->text();
+            $avatar = $friend->find('img', 0)->src;
+            $listFriends[] = ['name' => $name, 'avatar' => $avatar];
+        }
+        return $listFriends;
     }
 }

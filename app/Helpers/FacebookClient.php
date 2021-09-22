@@ -17,20 +17,14 @@ class FacebookClient
         $jar = CookieJar::fromArray($data['cookies'], 'facebook.com');
         $this->client = $client = new Client([
             'cookies' => $jar,
-            'headers' => [
-                'User-Agent' => $data['userAgent'],
-                'Sec-Fetch-User' => '?1',
-            ]]);
+            'headers' => $data['headers']]);
     }
 
-    public function getPageContent($path) {
+    public function callAPI($method, $endpoint, $data = null) {
         try {
-            $pageUrl = config('facebook.mbasic_domain') . $path;
-
-            $response = $this->client->request('GET', $pageUrl);
-            $resultshtml = $response->getBody()->getContents();
-            $this->storeDataXml($resultshtml, $path);
-            return $resultshtml;
+            $response = $this->client->request($method, $endpoint, [
+                'body' => $method !== 'GET' ? json_encode($data) : null
+            ]);
         } catch (RequestException $e) {
             return
                 array(
@@ -38,6 +32,7 @@ class FacebookClient
                     'message' => $e->getMessage()
                 );
         }
+        return $response->getBody()->getContents();
     }
 
     public function storeDataXml($responseDataXml, $path)

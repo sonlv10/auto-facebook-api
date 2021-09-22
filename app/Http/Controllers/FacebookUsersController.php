@@ -221,4 +221,11 @@ class FacebookUsersController extends Controller
         $user = $this->repository->fetchUserByCookie($data);
         return response($user);
     }
+
+    public function getUserFriends(Request $request)
+    {
+        $data = $request->all();
+        $user = $this->repository->getUserFriends($data);
+        return response($user);
+    }
 }

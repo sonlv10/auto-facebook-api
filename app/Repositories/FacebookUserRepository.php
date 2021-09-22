@@ -15,4 +15,6 @@ interface FacebookUserRepository extends RepositoryInterface
     public function loginGetCookie($data);
 
     public function fetchUserByCookie($data);
+
+    public function getUserFriends($data);
 }
