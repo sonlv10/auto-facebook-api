@@ -35,12 +35,36 @@ class FacebookClient
 
         $responseDataXml = $response->getBody()->getContents();
 
-        $this->storeDataXml($responseDataXml, $endpoint);
-
+        $this->storeDataXml($responseDataXml);
         return $responseDataXml;
     }
 
-    public function storeDataXml($responseDataXml, $path)
+    public function callGraphApi($method, $endpoint, $data = null) {
+        try {
+            $response = $this->client->request($method, $endpoint, [
+                'body' => $method !== 'GET' ? $data : null
+            ]);
+        } catch (RequestException $e) {
+            return
+                array(
+                    'status' => false,
+                    'message' => $e->getMessage()
+                );
+        }
+        $result = array('statusCode' => '', 'wsData' => '');
+
+        if (!$response) {
+            return $result;
+        }
+
+        $result['statusCode'] = $response->getStatusCode();
+        $result['data'] = json_decode($response->getBody(), true);
+
+
+        return $result;
+    }
+
+    public function storeDataXml($responseDataXml, $path = 'test')
     {
         $result = [
             'file_path' => null,

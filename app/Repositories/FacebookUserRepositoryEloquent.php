@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
+use Illuminate\Container\Container as Application;
 use App\Repositories\FacebookUserRepository;
 use App\Entities\FacebookUser;
 use App\Validators\FacebookUserValidator;
@@ -21,6 +22,14 @@ use simple_html_dom;
  */
 class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookUserRepository
 {
+    private $FbHelper;
+
+    public function __construct(Application $app, Common $FbHelper)
+    {
+        $this->FbHelper = $FbHelper;
+        parent::__construct($app);
+    }
+
     /**
      * Specify Model class name
      *
@@ -83,14 +92,12 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
 
     public function fetchUserByCookie($data) {
 
-        $fbHelpers = new Common();
-
         $cookies = $data['cookies'];
         if (is_array($cookies)) {
-            $cookies = $fbHelpers->getStrCookies($cookies);
+            $cookies = $this->FbHelper ->getStrCookies($cookies);
         }
 
-        $cookies = $fbHelpers->converCookiesStr2Arr($cookies);
+        $cookies = $this->FbHelper ->converCookiesStr2Arr($cookies);
         if (empty($cookies['c_user'])) {
             return false;
         }
@@ -117,14 +124,13 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
 
     private function getToken($client, $html)
     {
-        $fbHelpers = new Common();
-        $dtsg = $fbHelpers->get_string_between($html, 'name="fb_dtsg" value="', '"');
+        $dtsg = $this->FbHelper ->get_string_between($html, 'name="fb_dtsg" value="', '"');
         $url = config('facebook.domain') . 'v1.0/dialog/oauth/confirm';
         $params = 'fb_dtsg=' . $dtsg . '&app_id=124024574287414&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=page&access_token=&from_post=1&return_format=access_token&domain=&sso_device=ios&_CONFIRM=1&_user=100072773571604';
 
 
         $htmlToken = $client->callAPI('POST', $url, $params);
-        $token = $fbHelpers->get_string_between($htmlToken, 'access_token=', '&');
+        $token = $this->FbHelper ->get_string_between($htmlToken, 'access_token=', '&');
 
         return $token;
     }
@@ -142,7 +148,11 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
                 'Sec-Fetch-User' => '?1'
             ]
         ]);
-        $htmlContent = $fbClient->callAPI('GET', config('facebook.mbasic_domain'). 'friends/center/friends/');
+        $path = 'friends/center/friends/';
+        if (!empty($data['next_path'])) {
+            $path = $data['next_path'];
+        }
+        $htmlContent = $fbClient->callAPI('GET', config('facebook.mbasic_domain') . $path);
         $listFriends = $this->crawlerUserFriends($htmlContent);
         return $listFriends;
     }
@@ -161,12 +171,17 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
     private function crawlerUserFriends($html) {
         $listFriends = array();
         $dom = str_get_html($html);
-        $list =$dom->find('#friends_center_main table');
+        $list = $dom->find('#friends_center_main table');
         foreach($list as $friend) {
             $name = $friend->find('a', 0)->text();
             $avatar = $friend->find('img', 0)->src;
             $listFriends[] = ['name' => $name, 'avatar' => $avatar];
         }
-        return $listFriends;
+        $next = $dom->find('#friends_center_main > div >a', 0)->href ?? '';
+        $result = [
+            'listFriends' => $listFriends,
+            'next_path' => $next
+        ];
+        return $result;
     }
 }
