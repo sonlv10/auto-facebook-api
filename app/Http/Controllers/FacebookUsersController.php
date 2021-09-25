@@ -228,4 +228,14 @@ class FacebookUsersController extends Controller
         $user = $this->repository->getUserFriends($data);
         return response($user);
     }
+
+    public function getListUsers(Request $request)
+    {
+        $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
+        $facebookUsers = $this->repository->all();
+
+        return response()->json([
+            'data' => $facebookUsers,
+        ]);
+    }
 }
