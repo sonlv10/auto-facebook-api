@@ -174,8 +174,8 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
         $list = $dom->find('#friends_center_main table');
         foreach($list as $friend) {
             $name = $friend->find('a', 0)->text();
-            $avatar = $friend->find('img', 0)->src;
-            $listFriends[] = ['name' => $name, 'avatar' => $avatar];
+            $avatar = $friend->find('img', 0)->src ?? '';
+            $listFriends[] = ['name' => $name, 'avatar' => htmlspecialchars_decode($avatar)];
         }
         $next = $dom->find('#friends_center_main > div >a', 0)->href ?? '';
         $result = [
