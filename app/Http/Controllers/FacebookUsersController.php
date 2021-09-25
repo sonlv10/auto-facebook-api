@@ -217,25 +217,53 @@ class FacebookUsersController extends Controller
 
     public function getUserInfo(Request $request)
     {
+        $response = [
+            'success' => false,
+            'data' => null,
+        ];
         $data = $request->all();
         $user = $this->repository->fetchUserByCookie($data);
-        return response($user);
+        if (!empty($user)) {
+            $response = [
+                'success' => true,
+                'data' => $user,
+            ];
+        }
+        return response($response);
     }
 
     public function getUserFriends(Request $request)
     {
+        $response = [
+            'success' => false,
+            'data' => [],
+        ];
         $data = $request->all();
-        $user = $this->repository->getUserFriends($data);
-        return response($user);
+        $userFriends = $this->repository->getUserFriends($data);
+        if (!empty($userFriends)) {
+            $response = [
+                'success' => true,
+                'data' => $userFriends,
+            ];
+        }
+        return response($response);
     }
 
     public function getListUsers(Request $request)
     {
+        $response = [
+            'success' => false,
+            'data' => [],
+        ];
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
         $facebookUsers = $this->repository->all();
 
-        return response()->json([
-            'data' => $facebookUsers,
-        ]);
+        if (!empty($facebookUsers)) {
+            $response = [
+                'success' => true,
+                'data' => $facebookUsers,
+            ];
+        }
+        return response()->json($response);
     }
 }
