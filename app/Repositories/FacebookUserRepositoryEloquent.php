@@ -116,18 +116,19 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
         $dataUser['fb_uid'] = $cookies['c_user'];
         $dataUser['cookies'] = $cookies;
 
-        $dataUser['access_token'] = $this->getToken($fbClient, $htmlContent);
+        $dataUser['access_token'] = $this->getToken($fbClient, $dataUser['params']['fb_dtsg']);
 
         $this->updateOrCreate(['fb_uid' => $dataUser['fb_uid']], $dataUser);
         return $dataUser;
     }
 
-    private function getToken($client, $html)
+    private function getToken($client, $dtsg)
     {
-        $dtsg = $this->FbHelper ->get_string_between($html, 'name="fb_dtsg" value="', '"');
         $url = config('facebook.domain') . 'v1.0/dialog/oauth/confirm';
-        $params = 'fb_dtsg=' . $dtsg . '&app_id=124024574287414&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=page&access_token=&from_post=1&return_format=access_token&domain=&sso_device=ios&_CONFIRM=1&_user=100072773571604';
 
+        $params = [
+            'body' => 'fb_dtsg=' . $dtsg . '&app_id=124024574287414&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=page&access_token=&from_post=1&return_format=access_token&domain=&sso_device=ios&_CONFIRM=1&_user=100072773571604'
+        ];
 
         $htmlToken = $client->callAPI('POST', $url, $params);
         $token = $this->FbHelper ->get_string_between($htmlToken, 'access_token=', '&');
@@ -161,9 +162,23 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
         $dom = str_get_html($html);
         $avatar = htmlspecialchars_decode($dom->find('.bq a img', 0)->src);
         $name =$dom->find('#m-timeline-cover-section strong', 0)->text();
+
+        $params = [
+            'fb_dtsg' => $dom->find('input[name=fb_dtsg]', 0)->value,
+            'jazoest' => $dom->find('input[name=jazoest]', 0)->value,
+            'privacyx' => $dom->find('input[name=privacyx]', 0)->value,
+            'target' => $dom->find('input[name=target]', 0)->value,
+            'c_src' => $dom->find('input[name=c_src]', 0)->value,
+            'cwevent' => $dom->find('input[name=cwevent]', 0)->value,
+            'referrer' => $dom->find('input[name=referrer]', 0)->value,
+            'ctype' => $dom->find('input[name=ctype]', 0)->value,
+            'cver' => $dom->find('input[name=cver]', 0)->value,
+
+        ];
         $dataInfo = [
             'avatar' => $avatar,
             'name'   => $name,
+            'params' => $params
         ];
         return $dataInfo;
     }
@@ -183,5 +198,33 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
             'next_path' => $next
         ];
         return $result;
+    }
+
+    public function post($data)
+    {
+        $user = $this->findWhere(['fb_uid' => $data['fb_uid']])->first();
+        if (empty($user)) {
+            return false;
+        }
+        $fbClient = new FacebookClient([
+            'cookies' => $user->cookies,
+            'headers' => [
+                'userAgent' => $data['userAgent'],
+                'Sec-Fetch-User' => '?1'
+            ]
+        ]);
+        $path = 'composer/mbasic/';
+        $dataForm = $user->params;
+        $dataForm['xc_message'] = $data['message'];
+        $dataForm['view_post'] = 'Post';
+
+        $dataSend = [
+            'form_params' => $dataForm
+        ];
+        $response = $fbClient->callAPI('POST', config('facebook.mbasic_domain') . $path, $dataSend);
+        if (empty($response)) {
+            return false;
+        }
+        return true;
     }
 }

@@ -20,11 +20,9 @@ class FacebookClient
             'headers' => $data['headers']]);
     }
 
-    public function callAPI($method, $endpoint, $data = null) {
+    public function callAPI($method, $endpoint, $data = []) {
         try {
-            $response = $this->client->request($method, $endpoint, [
-                'body' => $method !== 'GET' ? $data : null
-            ]);
+            $response = $this->client->request($method, $endpoint, $data);
         } catch (RequestException $e) {
             return
                 array(

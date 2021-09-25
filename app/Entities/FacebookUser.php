@@ -18,7 +18,8 @@ class FacebookUser extends Model implements Transformable
     protected $table = 'facebook_users';
 
     protected $casts = [
-        'cookies' => 'array'
+        'cookies' => 'array',
+        'params' => 'array',
     ];
 
     /**
@@ -33,6 +34,7 @@ class FacebookUser extends Model implements Transformable
         'avatar',
         'cookies',
         'access_token',
+        'params',
     ];
 
 }

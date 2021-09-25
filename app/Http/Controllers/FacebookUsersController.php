@@ -266,4 +266,21 @@ class FacebookUsersController extends Controller
         }
         return response()->json($response);
     }
+
+    public function post(Request $request)
+    {
+        $response = [
+            'success' => false,
+            'message' => 'Failed to post!',
+        ];
+        $data = $request->all();
+        $post = $this->repository->post($data);
+        if (!empty($post)) {
+            $response = [
+                'success' => true,
+                'message' => 'Action completed!',
+            ];
+        }
+        return response()->json($response);
+    }
 }

@@ -24,5 +24,8 @@ Route::group(['prefix' => 'facebook'], function () {
     Route::post('user-info', 'FacebookUsersController@getUserInfo');
     Route::post('user-friends', 'FacebookUsersController@getUserFriends');
     Route::get('users', 'FacebookUsersController@getListUsers');
+    Route::group(['prefix' => 'post'], function () {
+        Route::post('me', 'FacebookUsersController@post');
+    });
 });
 

@@ -12,4 +12,7 @@ CREATE TABLE `facebook_users` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
-)
+);
+
+ALTER TABLE `auto_facebook_api`.`facebook_users`
+ADD COLUMN `params` json NULL AFTER `cookies`;
