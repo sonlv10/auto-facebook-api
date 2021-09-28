@@ -16,3 +16,15 @@ CREATE TABLE `facebook_users` (
 
 ALTER TABLE `auto_facebook_api`.`facebook_users`
 ADD COLUMN `params` json NULL AFTER `cookies`;
+
+-- ----------------------------
+-- Table structure for facebook_posts
+-- ----------------------------
+DROP TABLE IF EXISTS `facebook_posts`;
+CREATE TABLE `facebook_posts` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `post_id` int unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);

@@ -13,11 +13,15 @@ class FacebookClient
 {
     protected $client;
 
-    public function __construct(array $data) {
-        $jar = CookieJar::fromArray($data['cookies'], 'facebook.com');
-        $this->client = $client = new Client([
-            'cookies' => $jar,
-            'headers' => $data['headers']]);
+    public function __construct(array $data = []) {
+        $dataClient = [];
+        if (!empty($data['cookies'])) {
+            $dataClient['cookies'] = CookieJar::fromArray($data['cookies'], 'facebook.com');
+        }
+        if (!empty($data['headers'])) {
+            $dataClient['headers'] = $data['headers'];
+        }
+        $this->client = $client = new Client($dataClient);
     }
 
     public function callAPI($method, $endpoint, $data = []) {
