@@ -60,19 +60,24 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
 
     public function getComments($data)
     {
-        $result = [];
         $fbUserRepo = App(FacebookUserRepository::class);
         $user = $fbUserRepo->findWhere(['fb_uid' => $data['fb_uid']])->first();
         if (empty($user)) {
             return false;
         }
+        $postComments = [];
         $fbClient = new FacebookClient();
         $endpoint = "https://graph.facebook.com/" . $data['post_id'] . "/comments?summary=1&filter=stream&access_token=" . $user['access_token'];
-        $response = $fbClient->callGraphApi('GET', $endpoint);
-        if (!empty($response['data'])) {
-            $result = $response['data'];
-        }
-        return $result;
+        do {
+            $response = $fbClient->callGraphApi('GET', $endpoint);
+            if (!empty($response['data'])) {
+                $postComments = array_merge($postComments, $response['data']['data']);
+            }
+            $endpoint = $response['data']['paging']['next'] ?? null;
+
+        } while (!empty($endpoint));
+
+        return $postComments;
     }
     
 }

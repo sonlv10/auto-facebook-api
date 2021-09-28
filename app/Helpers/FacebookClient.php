@@ -21,7 +21,7 @@ class FacebookClient
         if (!empty($data['headers'])) {
             $dataClient['headers'] = $data['headers'];
         }
-        $this->client = $client = new Client($dataClient);
+        $this->client = new Client($dataClient);
     }
 
     public function callAPI($method, $endpoint, $data = []) {
