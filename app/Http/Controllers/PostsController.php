@@ -52,4 +52,11 @@ class PostsController extends Controller
 
         return response()->json($response);
     }
+
+    public function getAllComments(Request $request)
+    {
+        $response = $this->repository->getAllComments($request->all());
+
+        return response()->json($response);
+    }
 }

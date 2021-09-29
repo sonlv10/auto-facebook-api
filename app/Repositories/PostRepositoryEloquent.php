@@ -58,7 +58,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
-    public function getComments($data)
+    public function getAllComments($data)
     {
         $fbUserRepo = App(FacebookUserRepository::class);
         $user = $fbUserRepo->findWhere(['fb_uid' => $data['fb_uid']])->first();
@@ -78,6 +78,24 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         } while (!empty($endpoint));
 
         return $postComments;
+    }
+
+    public function getComments($data)
+    {
+        $fbUserRepo = App(FacebookUserRepository::class);
+        $user = $fbUserRepo->findWhere(['fb_uid' => $data['fb_uid']])->first();
+        if (empty($user)) {
+            return false;
+        }
+        $result = null;
+        $fbClient = new FacebookClient();
+        $endpoint = "https://graph.facebook.com/" . $data['post_id'] . "/comments?summary=1&filter=stream&access_token=" . $user['access_token'];
+        $response = $fbClient->callGraphApi('GET', $endpoint);
+        if (!empty($response['data'])) {
+            $result = $response['data'];
+        }
+
+        return $result;
     }
     
 }

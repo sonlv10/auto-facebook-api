@@ -13,4 +13,6 @@ interface PostRepository extends RepositoryInterface
 {
     //
     public function getComments($data);
+
+    public function getAllComments($data);
 }
