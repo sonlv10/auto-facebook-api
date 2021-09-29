@@ -60,14 +60,9 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
 
     public function getAllComments($data)
     {
-        $fbUserRepo = App(FacebookUserRepository::class);
-        $user = $fbUserRepo->findWhere(['fb_uid' => $data['fb_uid']])->first();
-        if (empty($user)) {
-            return false;
-        }
         $postComments = [];
         $fbClient = new FacebookClient();
-        $endpoint = "https://graph.facebook.com/" . $data['post_id'] . "/comments?summary=1&filter=stream&access_token=" . $user['access_token'];
+        $endpoint = "https://graph.facebook.com/" . $data['post_id'] . "/comments?summary=1&filter=stream&access_token=" . $data['access_token'];
         do {
             $response = $fbClient->callGraphApi('GET', $endpoint);
             if (!empty($response['data'])) {
@@ -82,14 +77,9 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
 
     public function getComments($data)
     {
-        $fbUserRepo = App(FacebookUserRepository::class);
-        $user = $fbUserRepo->findWhere(['fb_uid' => $data['fb_uid']])->first();
-        if (empty($user)) {
-            return false;
-        }
         $result = null;
         $fbClient = new FacebookClient();
-        $endpoint = "https://graph.facebook.com/" . $data['post_id'] . "/comments?summary=1&filter=stream&access_token=" . $user['access_token'];
+        $endpoint = "https://graph.facebook.com/" . $data['post_id'] . "/comments?summary=1&filter=stream&access_token=" . $data['access_token'];
         if (!empty($data['next'])) {
             $endpoint = $data['next'];
         }
