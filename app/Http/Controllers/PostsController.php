@@ -8,6 +8,7 @@ use App\Http\Requests;
 use Prettus\Validator\Contracts\ValidatorInterface;
 use Prettus\Validator\Exceptions\ValidatorException;
 use App\Http\Requests\PostCreateRequest;
+use App\Presenters\PostPresenter;
 use App\Http\Requests\PostUpdateRequest;
 use App\Repositories\PostRepository;
 use App\Validators\PostValidator;
@@ -49,7 +50,7 @@ class PostsController extends Controller
     public function getComments(Request $request)
     {
         $response = $this->repository->getComments($request->all());
-
+        $response['data'] = app(PostPresenter::class)->present($response['data'])['data'];
         return response()->json($response);
     }
 

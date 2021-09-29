@@ -19,15 +19,18 @@ class PostTransformer extends TransformerAbstract
      *
      * @return array
      */
-    public function transform(Post $model)
+    public function transform($model)
     {
-        return [
-            'id'         => (int) $model->id,
-
-            /* place your other model properties here */
-
-            'created_at' => $model->created_at,
-            'updated_at' => $model->updated_at
-        ];
+        $result = array();
+        foreach ($model as $comment) {
+            $result[] = [
+                'fb_uid'         => $comment['from']['id'],
+                'name'         => $comment['from']['name'],
+                'comment_id'         => $comment['id'],
+                'message'         => $comment['message'],
+                'created_time' => $comment['created_time'],
+            ];
+        }
+        return $result;
     }
 }
