@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
-    public function loginCreateToken (Request $request) {
+    public function createToken (Request $request) {
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -26,7 +26,7 @@ class AuthController extends Controller
         return ['token' => $token];
     }
 
-    public function revokingTokens (Request $request) {
+    public function deleteTokens (Request $request) {
         // Revoke all tokens...
         return $request->user()->tokens()->delete();
     }
