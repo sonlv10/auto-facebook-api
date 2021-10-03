@@ -14,13 +14,13 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::post('tokens/create', 'AuthController@createToken');
+Route::post('login', 'AuthController@login');
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user', function (Request $request) {
         return $request->user();
     });
-    Route::post('tokens/delete', 'AuthController@deleteTokens');
+    Route::post('logout', 'AuthController@logout');
 
     Route::group(['prefix' => 'facebook'], function () {
         Route::post('login', 'FacebookUsersController@login');
