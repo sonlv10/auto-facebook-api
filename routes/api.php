@@ -17,9 +17,7 @@ use App\Http\Controllers\AuthController;
 Route::post('login', 'AuthController@login');
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('user', function (Request $request) {
-        return $request->user();
-    });
+    Route::get('user','AuthController@getUserInfo');
     Route::post('store-token', 'AuthController@storeFbToken');
     Route::post('logout', 'AuthController@logout');
     Route::group(['prefix' => 'facebook'], function () {

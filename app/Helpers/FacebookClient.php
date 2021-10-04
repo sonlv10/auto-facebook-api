@@ -7,6 +7,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 
 
 
@@ -27,19 +29,26 @@ class FacebookClient
     }
 
     public function callAPI($method, $endpoint, $data = []) {
+        $result = array('success' => false);
         try {
             $response = $this->client->request($method, $endpoint, $data);
         } catch (RequestException $e) {
-            return
-                array(
-                    'status' => false,
-                    'message' => $e->getMessage()
-                );
+            $result['message'] = $e->getMessage();
+            return $result;
+        } catch (RequestException $e) {
+            $result['message'] = $e->getMessage();
+            return $result;
+        } catch (ClientException $e) {
+            $result['message'] = $e->getMessage();
+            return $result;
+        } catch (ConnectException $e) {
+            $result['message'] = $e->getMessage();
+            return $result;
         }
 
         $responseDataXml = $response->getBody()->getContents();
 
-        $this->storeDataXml($responseDataXml);
+//        $this->storeDataXml($responseDataXml);
         return $responseDataXml;
     }
 
@@ -51,6 +60,12 @@ class FacebookClient
                 'body' => $method !== 'GET' ? $data : null
             ]);
         } catch (RequestException $e) {
+            $result['message'] = $e->getMessage();
+            return $result;
+        } catch (ClientException $e) {
+            $result['message'] = $e->getMessage();
+            return $result;
+        } catch (ConnectException $e) {
             $result['message'] = $e->getMessage();
             return $result;
         }

@@ -54,4 +54,12 @@ class AuthController extends Controller
         }
         return $result;
     }
+
+    public function getUserInfo (Request $request) {
+        $user = $request->user();
+        $fbUserRepo = App(FacebookUserRepository::class);
+        $resultCheck = $fbUserRepo->checkTokenValid($user->fb_access_token);
+        $user->fbUserInfo = !empty($resultCheck['data']) ? $resultCheck['data'] : null;
+        return $user;
+    }
 }
