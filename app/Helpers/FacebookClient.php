@@ -6,6 +6,8 @@ use Sunra\PhpSimple\HtmlDomParser;
 use GuzzleHttp\Client;
 use GuzzleHttp\Cookie\CookieJar;
 use Illuminate\Support\Facades\Storage;
+use GuzzleHttp\Exception\RequestException;
+
 
 
 
@@ -42,23 +44,22 @@ class FacebookClient
     }
 
     public function callGraphApi($method, $endpoint, $data = null) {
+
+        $result = array('success' => false, 'statusCode' => '', 'data' => '');
         try {
             $response = $this->client->request($method, $endpoint, [
                 'body' => $method !== 'GET' ? $data : null
             ]);
         } catch (RequestException $e) {
-            return
-                array(
-                    'status' => false,
-                    'message' => $e->getMessage()
-                );
+            $result['message'] = $e->getMessage();
+            return $result;
         }
-        $result = array('statusCode' => '', 'wsData' => '');
 
         if (!$response) {
             return $result;
         }
 
+        $result['success'] = true;
         $result['statusCode'] = $response->getStatusCode();
         $result['data'] = json_decode($response->getBody(), true);
 

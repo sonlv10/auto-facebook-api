@@ -227,4 +227,16 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
         }
         return true;
     }
+
+    public function checkTokenValid($token)
+    {
+        $result = ['success' => false, 'data' => []];
+        $fbClient = new FacebookClient();
+        $endpoint = "https://graph.facebook.com/me?access_token=" . $token;
+        $response = $fbClient->callGraphApi('GET', $endpoint);
+        if ($response['success']) {
+            return ['success' => true, 'data' => $response['data']];
+        }
+        return $result;
+    }
 }

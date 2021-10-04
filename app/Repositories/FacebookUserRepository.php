@@ -19,4 +19,6 @@ interface FacebookUserRepository extends RepositoryInterface
     public function getUserFriends($data);
 
     public function post($data);
+
+    public function checkTokenValid($token);
 }

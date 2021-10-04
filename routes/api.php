@@ -20,8 +20,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user', function (Request $request) {
         return $request->user();
     });
+    Route::post('store-token', 'AuthController@storeFbToken');
     Route::post('logout', 'AuthController@logout');
-
     Route::group(['prefix' => 'facebook'], function () {
         Route::post('login', 'FacebookUsersController@login');
         Route::get('get-content', 'FacebookUsersController@getPageContent');
