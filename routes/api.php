@@ -31,6 +31,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('get-comments', 'PostsController@getComments');
             Route::post('get-all-comments', 'PostsController@getAllComments');
         });
+        Route::post('find-id', 'PostsController@FindId');
     });
 });
 

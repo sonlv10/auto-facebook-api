@@ -60,4 +60,11 @@ class PostsController extends Controller
 
         return response()->json($response);
     }
+
+    public function FindId(Request $request)
+    {
+        $response = $this->repository->findId($request->get('url'));
+
+        return response()->json($response);
+    }
 }

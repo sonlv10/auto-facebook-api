@@ -90,5 +90,32 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
 
         return $result;
     }
-    
+
+    public function findId($url)
+    {
+        if (!str_contains($url, 'facebook.com')) {
+            return '';
+        }
+        $parts = parse_url($url);
+        $path = !empty($parts['path']) ? $parts['path'] : '';
+        $parhArr = array_filter(explode('/', $path));
+        if (!empty($parts['query'])) {
+            parse_str($parts['query'], $query);
+        }
+        $idArr = array_filter($parhArr, function ($id) {
+            return is_numeric($id);
+        });
+        if (!empty($idArr)) {
+            return end($idArr);
+        } elseif (!empty($query['v']) || !empty($query['story_fbid']) || !empty($query['id'])) {
+            return $query['v'] ?? $query['story_fbid'] ?? $query['id'];
+        }
+        else {
+            $url = 'https://mbasic.facebook.com/' . array_shift($parhArr);
+            $fbClient = new FacebookClient();
+            $htmlContent = $fbClient->callAPI('GET', $url);
+            $id = $this->FbHelper->get_string_between($htmlContent, 'rid=', '&');
+            return $id;
+        }
+    }
 }
