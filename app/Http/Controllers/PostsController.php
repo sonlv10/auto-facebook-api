@@ -50,7 +50,9 @@ class PostsController extends Controller
     public function getComments(Request $request)
     {
         $response = $this->repository->getComments($request->all());
-        $response['data'] = app(PostPresenter::class)->present($response['data'])['data'];
+        if (!empty($response['data'])) {
+            $response['data'] = app(PostPresenter::class)->present($response['data'])['data'];
+        }
         return response()->json($response);
     }
 
