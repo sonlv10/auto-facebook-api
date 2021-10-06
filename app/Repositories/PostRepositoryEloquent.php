@@ -107,17 +107,34 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
         });
         if (!empty($idArr)) {
             return end($idArr);
-        } elseif (!empty($query['v']) || !empty($query['story_fbid']) || !empty($query['id'])) {
-            return $query['v'] ?? $query['story_fbid'] ?? $query['id'];
+        } elseif (!empty($query['v']) || !empty($query['fbid']) || !empty($query['story_fbid']) || !empty($query['id'])) {
+            return $query['v'] ?? $query['fbid'] ?? $query['story_fbid'] ?? $query['id'];
         }
         else {
-            $url = 'https://mbasic.facebook.com/' . $path;
+            $url = 'https://www.facebook.com/' . $path;
             $fbClient = new FacebookClient();
             $response = $fbClient->callAPI('GET', $url);
             if (!$response['success']) {
-                return false;
+                return '';
             }
             $htmlContent = $response['data'];
+            // get id profile
+            if (str_contains($htmlContent, 'fb://profile/')) {
+                $id = $this->FbHelper->get_string_between($htmlContent, 'fb://profile/', '"');
+                return $id;
+            }
+            // get page id
+            if (str_contains($htmlContent, 'fb://page/')) {
+                $id = $this->FbHelper->get_string_between($htmlContent, 'fb://page/', '?');
+                return $id;
+            }
+
+            // get page id
+            if (str_contains($htmlContent, 'fb://group/')) {
+                $id = $this->FbHelper->get_string_between($htmlContent, 'fb://group/?id=', '"');
+                return $id;
+            }
+
             $id = $this->FbHelper->get_string_between($htmlContent, 'rid=', '&');
             return $id;
         }
