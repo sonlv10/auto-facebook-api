@@ -111,9 +111,13 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
             return $query['v'] ?? $query['story_fbid'] ?? $query['id'];
         }
         else {
-            $url = 'https://mbasic.facebook.com/' . array_shift($parhArr);
+            $url = 'https://mbasic.facebook.com/' . $path;
             $fbClient = new FacebookClient();
-            $htmlContent = $fbClient->callAPI('GET', $url);
+            $response = $fbClient->callAPI('GET', $url);
+            if (!$response['success']) {
+                return false;
+            }
+            $htmlContent = $response['data'];
             $id = $this->FbHelper->get_string_between($htmlContent, 'rid=', '&');
             return $id;
         }

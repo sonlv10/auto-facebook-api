@@ -111,7 +111,12 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
             ]
         ]);
 
-        $htmlContent = $fbClient->callAPI('GET', config('facebook.mbasic_domain'). $cookies['c_user']);
+        $response = $fbClient->callAPI('GET', config('facebook.mbasic_domain'). $cookies['c_user']);
+        if (!$response['success']) {
+            return false;
+        }
+
+        $htmlContent = $response['data'];
         $dataUser = $this->crawlerInfoUser($htmlContent);
         $dataUser['fb_uid'] = $cookies['c_user'];
         $dataUser['cookies'] = $cookies;
@@ -130,7 +135,11 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
             'body' => 'fb_dtsg=' . $dtsg . '&app_id=124024574287414&redirect_uri=fbconnect%3A%2F%2Fsuccess&display=page&access_token=&from_post=1&return_format=access_token&domain=&sso_device=ios&_CONFIRM=1&_user=100072773571604'
         ];
 
-        $htmlToken = $client->callAPI('POST', $url, $params);
+        $response = $client->callAPI('POST', $url, $params);
+        if (!$response['success']) {
+            return false;
+        }
+        $htmlToken = $response['data'];
         $token = $this->FbHelper ->get_string_between($htmlToken, 'access_token=', '&');
 
         return $token;
@@ -153,7 +162,11 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
         if (!empty($data['next_path'])) {
             $path = $data['next_path'];
         }
-        $htmlContent = $fbClient->callAPI('GET', config('facebook.mbasic_domain') . $path);
+        $response = $fbClient->callAPI('GET', config('facebook.mbasic_domain') . $path);
+        if (!$response['success']) {
+            return false;
+        }
+        $htmlContent = $response['data'];
         $listFriends = $this->crawlerUserFriends($htmlContent);
         return $listFriends;
     }
@@ -222,7 +235,7 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
             'form_params' => $dataForm
         ];
         $response = $fbClient->callAPI('POST', config('facebook.mbasic_domain') . $path, $dataSend);
-        if (empty($response)) {
+        if (empty($response['success'])) {
             return false;
         }
         return true;

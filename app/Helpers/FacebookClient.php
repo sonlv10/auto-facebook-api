@@ -48,8 +48,11 @@ class FacebookClient
 
         $responseDataXml = $response->getBody()->getContents();
 
-//        $this->storeDataXml($responseDataXml);
-        return $responseDataXml;
+        $this->storeDataXml($responseDataXml);
+        return [
+            'success' => true,
+            'data' => $responseDataXml
+        ];
     }
 
     public function callGraphApi($method, $endpoint, $data = null) {
