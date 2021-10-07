@@ -79,7 +79,7 @@ class PostRepositoryEloquent extends BaseRepository implements PostRepository
     {
         $result = null;
         $fbClient = new FacebookClient();
-        $endpoint = "https://graph.facebook.com/" . $data['post_id'] . "/comments?summary=1&filter=stream&access_token=" . $data['access_token'];
+        $endpoint = "https://graph.facebook.com/" . $data['post_id'] . "/comments?access_token=" . $data['access_token'] . "&limit=2500";
         if (!empty($data['next'])) {
             $endpoint = $data['next'];
         }
