@@ -4,6 +4,7 @@ namespace App\Transformers;
 
 use League\Fractal\TransformerAbstract;
 use App\Entities\Post;
+use Carbon\Carbon;
 
 /**
  * Class PostTransformer.
@@ -33,7 +34,7 @@ class PostTransformer extends TransformerAbstract
                 'message'         => $comment['message'],
                 'phone'         => !empty($phone_matches) ? $phone_matches[0] : null,
                 'email'         => !empty($email_matches) ? $email_matches[0] : null,
-                'created_time' => $comment['created_time'],
+                'created_time' => Carbon::parse($comment['created_time'])->format('d-m-Y H:i:s'),
             ];
         }
         return $result;
