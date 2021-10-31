@@ -26,12 +26,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('user-info', 'FacebookUsersController@getUserInfo');
         Route::post('user-friends', 'FacebookUsersController@getUserFriends');
         Route::get('users', 'FacebookUsersController@getListUsers');
+        Route::post('get-2fa', 'FacebookUsersController@get2fa');
+        Route::post('store-users', 'FacebookUsersController@storeUsers');
         Route::group(['prefix' => 'post'], function () {
             Route::post('me', 'FacebookUsersController@post');
             Route::post('get-comments', 'PostsController@getComments');
             Route::post('get-all-comments', 'PostsController@getAllComments');
         });
         Route::post('find-id', 'PostsController@FindId');
+    });
+    Route::group(['prefix' => 'proxy'], function () {
+        Route::get('list', 'ProxiesController@index');
+        Route::post('store', 'ProxiesController@store');
     });
 });
 

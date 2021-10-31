@@ -25,6 +25,7 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         $this->app->bind(\App\Repositories\FacebookUserRepository::class, \App\Repositories\FacebookUserRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\PostRepository::class, \App\Repositories\PostRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\ProxyRepository::class, \App\Repositories\ProxyRepositoryEloquent::class);
         //:end-bindings:
     }
 }

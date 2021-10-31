@@ -29,6 +29,10 @@ class FacebookUser extends Model implements Transformable
      */
     protected $fillable = [
         'id',
+        'email',
+        'password',
+        'secret',
+        'proxy_id',
         'fb_uid',
         'name',
         'avatar',
@@ -37,4 +41,8 @@ class FacebookUser extends Model implements Transformable
         'params',
     ];
 
+    public function proxy()
+    {
+        return $this->hasOne(Proxy::class, 'id', 'proxy_id');
+    }
 }
