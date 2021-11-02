@@ -146,13 +146,13 @@ class FacebookUsersController extends Controller
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
-    public function update(FacebookUserUpdateRequest $request, $id)
+    public function update(Request $request)
     {
         try {
+            $data = $request->all();
+            $this->validator->with($data)->passesOrFail(ValidatorInterface::RULE_UPDATE);
 
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-
-            $facebookUser = $this->repository->update($request->all(), $id);
+            $facebookUser = $this->repository->update($request->all(), $data['id']);
 
             $response = [
                 'message' => 'FacebookUser updated.',
