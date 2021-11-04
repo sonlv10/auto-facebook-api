@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('get-2fa', 'FacebookUsersController@get2fa');
         Route::post('store-users', 'FacebookUsersController@storeUsers');
         Route::post('update-user', 'FacebookUsersController@update');
+        Route::delete('delete-user/{id}', 'FacebookUsersController@destroy');
         Route::group(['prefix' => 'post'], function () {
             Route::post('me', 'FacebookUsersController@post');
             Route::post('get-comments', 'PostsController@getComments');

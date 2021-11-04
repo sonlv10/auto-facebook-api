@@ -33,6 +33,7 @@ class FacebookUser extends Model implements Transformable
         'password',
         'secret',
         'proxy_id',
+        'check_point',
         'fb_uid',
         'name',
         'avatar',
