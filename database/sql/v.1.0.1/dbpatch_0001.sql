@@ -2,8 +2,8 @@
 ALTER TABLE `auto_facebook_api`.`facebook_users`
 ADD COLUMN `email` varchar(255) NOT NULL AFTER `id`,
 ADD COLUMN `password` varchar(255) NOT NULL AFTER `email`,
-ADD COLUMN `secret` varchar(255) NULL AFTER `password`
-ADD COLUMN `proxy_id` int NULL AFTER `updated_at`;
+ADD COLUMN `secret` varchar(255) NULL AFTER `password`,
+ADD COLUMN `proxy_id` int NULL AFTER `updated_at`,
 MODIFY COLUMN `fb_uid` varchar(255) NULL AFTER `secret`;
 
 -- Add new table proxy_list

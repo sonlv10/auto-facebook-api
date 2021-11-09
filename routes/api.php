@@ -19,6 +19,7 @@ Route::post('login', 'AuthController@login');
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user','AuthController@getUserInfo');
     Route::post('store-token', 'AuthController@storeFbToken');
+    Route::post('store-setting', 'AuthController@storeSettingUser');
     Route::post('logout', 'AuthController@logout');
     Route::group(['prefix' => 'facebook'], function () {
         Route::post('login', 'FacebookUsersController@login');
