@@ -255,8 +255,9 @@ class FacebookUsersController extends Controller
             'success' => false,
             'data' => [],
         ];
+        $user = $request->user();
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $facebookUsers = $this->repository->with('proxy')->all();
+        $facebookUsers = $this->repository->with('proxy')->findWhere(['user_id' => $user->id]);
 
         if (!empty($facebookUsers)) {
             $response = [

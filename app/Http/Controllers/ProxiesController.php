@@ -46,10 +46,11 @@ class ProxiesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $proxies = $this->repository->all();
+        $user = $request->user();
+        $proxies = $this->repository->findWhere(['user_id' => $user->id]);
 
         if (request()->wantsJson()) {
 
