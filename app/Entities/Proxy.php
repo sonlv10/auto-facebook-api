@@ -23,6 +23,7 @@ class Proxy extends Model implements Transformable
      */
     protected $fillable = [
         'id',
+        'user_id',
         'host',
         'port',
         'user_name',

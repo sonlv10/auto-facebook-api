@@ -306,7 +306,9 @@ class FacebookUsersController extends Controller
     public function storeUsers(Request $request)
     {
         $users = $data = $request->all();
+        $auth = $request->user();
         foreach ($users as $user) {
+            $user['user_id'] = $auth->id;
             try {
                 $this->validator->with($user)->passesOrFail(ValidatorInterface::RULE_CREATE);
                 $this->repository->create($user);
