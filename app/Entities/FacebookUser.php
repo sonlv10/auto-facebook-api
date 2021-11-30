@@ -29,6 +29,7 @@ class FacebookUser extends Model implements Transformable
      */
     protected $fillable = [
         'id',
+        'user_id',
         'email',
         'password',
         'secret',

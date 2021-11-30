@@ -76,8 +76,10 @@ class ProxiesController extends Controller
         try {
 
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_CREATE);
-
-            $proxy = $this->repository->create($request->all());
+            $user = $request->user();
+            $data = $request->all();
+            $data['user_id'] = $user->id;
+            $proxy = $this->repository->create($data);
 
             $response = [
                 'message' => 'Proxy created.',
