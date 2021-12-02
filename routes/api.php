@@ -41,6 +41,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::group(['prefix' => 'proxy'], function () {
         Route::get('list', 'ProxiesController@index');
         Route::post('store', 'ProxiesController@store');
+        Route::put('update', 'ProxiesController@update');
+        Route::delete('{id}', 'ProxiesController@destroy');
     });
 });
 

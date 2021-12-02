@@ -149,13 +149,13 @@ class ProxiesController extends Controller
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
-    public function update(ProxyUpdateRequest $request, $id)
+    public function update(Request $request)
     {
         try {
 
             $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-
-            $proxy = $this->repository->update($request->all(), $id);
+            $data = $request->all();
+            $proxy = $this->repository->update($request->all(), $data['id']);
 
             $response = [
                 'message' => 'Proxy updated.',
