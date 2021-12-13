@@ -34,7 +34,7 @@ class PostTransformer extends TransformerAbstract
                 'message'         => $comment['message'],
                 'phone'         => !empty($phone_matches) ? $phone_matches[0] : null,
                 'email'         => !empty($email_matches) ? $email_matches[0] : null,
-                'created_time' => Carbon::parse($comment['created_time'])->format('d-m-Y H:i:s'),
+                'created_time' => Carbon::parse($comment['created_time'])->setTimezone('Asia/Ho_Chi_Minh')->format('d-m-Y H:i:s'),
             ];
         }
         return $result;
