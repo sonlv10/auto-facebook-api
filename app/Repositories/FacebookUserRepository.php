@@ -20,5 +20,7 @@ interface FacebookUserRepository extends RepositoryInterface
 
     public function post($data);
 
+    public function get2fa($data);
+
     public function checkTokenValid($token);
 }

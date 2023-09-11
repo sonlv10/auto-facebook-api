@@ -13,6 +13,7 @@ use GuzzleHttp\Client;
 use App\Helpers\Common;
 use App\Helpers\FacebookClient;
 use simple_html_dom;
+use GuzzleHttp\Exception\RequestException;
 
 
 /**
@@ -251,5 +252,18 @@ class FacebookUserRepositoryEloquent extends BaseRepository implements FacebookU
             return ['success' => true, 'data' => $response['data']];
         }
         return $result;
+    }
+
+    public function get2fa($data) {
+        $client = new Client();
+        $result = array('success' => false);
+        try {
+            $endpoint = "http://2fa.live/tok/" . $data['secret'];
+            $response = $client->request('GET', $endpoint);
+        } catch (RequestException $e) {
+            $result['message'] = $e->getMessage();
+            return $result;
+        }
+        return json_decode($response->getBody(), true);
     }
 }

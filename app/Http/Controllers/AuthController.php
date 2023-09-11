@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Repositories\FacebookUserRepository;
+use App\Presenters\UserPresenter;
+
 
 class AuthController extends Controller
 {
@@ -60,6 +62,18 @@ class AuthController extends Controller
         $fbUserRepo = App(FacebookUserRepository::class);
         $resultCheck = $fbUserRepo->checkTokenValid($user->fb_access_token);
         $user->fbUserInfo = !empty($resultCheck['data']) ? $resultCheck['data'] : null;
-        return $user;
+        return app(UserPresenter::class)->present($user)['data'];
+    }
+
+    public function storeSettingUser(Request $request)
+    {
+        $user = $request->user();
+        $user->params = $request->get('params');
+        $user->save();
+        return [
+            'success' => true,
+            'data'    => $user,
+            'message' => 'Save setting successfully'
+        ];
     }
 }

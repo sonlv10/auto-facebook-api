@@ -146,13 +146,13 @@ class FacebookUsersController extends Controller
      *
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
-    public function update(FacebookUserUpdateRequest $request, $id)
+    public function update(Request $request)
     {
         try {
+            $data = $request->all();
+            $this->validator->with($data)->passesOrFail(ValidatorInterface::RULE_UPDATE);
 
-            $this->validator->with($request->all())->passesOrFail(ValidatorInterface::RULE_UPDATE);
-
-            $facebookUser = $this->repository->update($request->all(), $id);
+            $facebookUser = $this->repository->update($request->all(), $data['id']);
 
             $response = [
                 'message' => 'FacebookUser updated.',
@@ -255,8 +255,9 @@ class FacebookUsersController extends Controller
             'success' => false,
             'data' => [],
         ];
+        $user = $request->user();
         $this->repository->pushCriteria(app('Prettus\Repository\Criteria\RequestCriteria'));
-        $facebookUsers = $this->repository->all();
+        $facebookUsers = $this->repository->with('proxy')->findWhere(['user_id' => $user->id]);
 
         if (!empty($facebookUsers)) {
             $response = [
@@ -282,5 +283,47 @@ class FacebookUsersController extends Controller
             ];
         }
         return response()->json($response);
+    }
+
+    public function get2fa(Request $request)
+    {
+        $response = [
+            'success' => false,
+            'message' => 'Failed to post!',
+        ];
+        $data = $request->all();
+        $token = $this->repository->get2fa($data);
+        if (!empty($token)) {
+            $response = [
+                'success' => true,
+                'message' => 'Action completed!',
+                'data' => $token
+            ];
+        }
+        return response()->json($response);
+    }
+
+    public function storeUsers(Request $request)
+    {
+        $users = $data = $request->all();
+        $auth = $request->user();
+        foreach ($users as $user) {
+            $user['user_id'] = $auth->id;
+            try {
+                $this->validator->with($user)->passesOrFail(ValidatorInterface::RULE_CREATE);
+                $this->repository->create($user);
+            } catch (ValidatorException $e) {
+                if ($request->wantsJson()) {
+                    return response()->json([
+                        'error'   => true,
+                        'message' => $e->getMessageBag()
+                    ]);
+                }
+            }
+        }
+        return response()->json([
+            'success' => true,
+            'message' => 'Action completed!',
+        ]);
     }
 }
